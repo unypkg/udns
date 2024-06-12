@@ -41,7 +41,7 @@ gitdepth="--depth=1"
 ### Get version info from git remote
 # shellcheck disable=SC2086
 latest_head="$(git ls-remote --refs --tags --sort="v:refname" $pkggit | grep -E "udns_[0-9_]+$" | tail --lines=1)"
-latest_ver="$(echo "$latest_head" | grep -o "udns_[0-9_].*" | sed -e "s|udns_||" -e "s|_|.|")"
+latest_ver="$(echo "$latest_head" | grep -o "udns_[0-9_].*" | sed -e "s|udns_||" -e "s|_|.|g")"
 latest_commit_id="$(echo "$latest_head" | cut --fields=1)"
 
 version_details
