@@ -35,13 +35,13 @@ mkdir -pv /uny/sources
 cd /uny/sources || exit
 
 pkgname="udns"
-pkggit="https://github.com/udns/udns.git refs/tags/*"
+pkggit="https://github.com/ortclib/udns.git refs/tags/udns*"
 gitdepth="--depth=1"
 
 ### Get version info from git remote
 # shellcheck disable=SC2086
-latest_head="$(git ls-remote --refs --tags --sort="v:refname" $pkggit | grep -E "v[0-9.]+$" | tail --lines=1)"
-latest_ver="$(echo "$latest_head" | grep -o "v[0-9.].*" | sed "s|v||")"
+latest_head="$(git ls-remote --refs --tags --sort="v:refname" $pkggit | grep -E "udns_[0-9_]+$" | tail --lines=1)"
+latest_ver="$(echo "$latest_head" | grep -o "udns_[0-9_].*" | sed -e "s|udns_||" -e "s|_|.|")"
 latest_commit_id="$(echo "$latest_head" | cut --fields=1)"
 
 version_details
@@ -77,12 +77,17 @@ get_include_paths
 
 unset LD_RUN_PATH
 
-./configure \
-    --prefix=/uny/pkg/"$pkgname"/"$pkgver"
+./configure
+#    --prefix=/uny/pkg/"$pkgname"/"$pkgver"
 
 make -j"$(nproc)"
-make -j"$(nproc)" check 
-make -j"$(nproc)" install
+ranlib libudns.a
+
+make -j"$(nproc)" shared
+
+mkdir -p /uny/pkg/"$pkgname"/"$pkgver"/{include,lib}
+cp -a udns.h /uny/pkg/"$pkgname"/"$pkgver"/include
+cp -a libudns* /uny/pkg/"$pkgname"/"$pkgver"/lib
 
 ####################################################
 ### End of individual build script
